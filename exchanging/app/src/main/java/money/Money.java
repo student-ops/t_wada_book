@@ -1,21 +1,49 @@
 package money;
 
-abstract class Money {
+class Money implements Expression {
     protected int amount;
+    protected String currency;
 
-    abstract Money times(int multiplier);
+    Money(int amount, String currency) {
+        this.amount = amount;
+        this.currency = currency;
+    }
+
+    Money times(int multiplier) {
+        return new Money(amount * multiplier, currency);
+    };
+
+    Expression plus(Money addend) {
+        return new Sum(this, addend);
+    }
+
+    public Money reduce(Bank bank, String to) {
+        // return this;
+
+        int rate = bank.rate(currency, to);
+        return new Money(amount / rate, to);
+    }
+
+    String currency() {
+        return currency;
+    }
 
     public boolean equals(Object object) {
         Money money = (Money) object;
         return amount == money.amount
-                && getClass().equals(money.getClass());
+                && currency().equals(money.currency());
+    }
+
+    public String toString() {
+        return amount + " " + currency;
     }
 
     static Money dollar(int amount) {
-        return new Dollar(amount);
+        return new Money(amount, "USD");
     }
 
-    static Franc franc(int amount) {
-        return new Franc(amount);
+    static Money franc(int amount) {
+        return new Money(amount, "CHF");
     }
+
 }
